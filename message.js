@@ -3,7 +3,7 @@
 "use strict";
 
 let PORT = 80;
-let TOKEN = "T35HmYT3R5dnkL6VtT37nFBmKb3JF2Xu";
+let TOKEN = require("fs").readFileSync("TOKEN.txt", "utf8").trim();
 
 let http = require("http");
 let qs = require("qs");
