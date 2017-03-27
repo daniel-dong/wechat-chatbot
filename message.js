@@ -33,7 +33,7 @@ function makeXMLResponse(origMsg, content) {
 
 function callBotAPI(msg) {
     return new Promise(function (resolve, reject) {
-        let msgType = msg.MsgType[0];
+        let msgType = msg.MsgType[0];  //收到消息的类型
         switch (msgType) {
             case "text":
                 let url = "http://api.qingyunke.com/api.php?key=free&appid=0&msg=" + msg.Content[0];
@@ -41,13 +41,23 @@ function callBotAPI(msg) {
                     console.log("callBotAPI | url:", url, " body:", body);
                     if (error) {
                         console.log("callBotAPI | error:", error);
-                        throw new Error("Oops! Something went wrong! (code: 1)");
+                        throw error;  //异常也会被 .catch() 捕获，无需显示调用 reject()
                     } else {
-                        let apiResponse = JSON.parse(body);
+                        let apiResponse = JSON.parse(body);  //可能抛出异常，无需在此处 catch
+                        /*
+                         注意以下写法不正确：
+                         try {
+                         ...
+                         } catch(error) {
+                         reject(error)
+                         }
+                         调用 reject 后，后续代码仍会执行。
+                         */
+
                         if (apiResponse.result === 0) {
                             resolve(apiResponse.content);
                         } else {
-                            throw new Error("Oops! Something went wrong! (code: 2)");
+                            throw new Error("Bot API returned wrong data");
                         }
                     }
                 });
@@ -71,7 +81,7 @@ let server = http.createServer(function (request, response) {
         response.end(params.echostr);  //接入认证
     } else {
         let postData = "";
-        request.addListener("data", function (postChunk) {
+        request.addListener("data", function (postChunk) {  //data 事件不会在注册监听器前触发吗？
             postData += postChunk;
         });
 
