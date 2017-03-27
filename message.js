@@ -41,17 +41,13 @@ function callBotAPI(msg) {
                     console.log("callBotAPI | url:", url, " body:", body);
                     if (error) {
                         console.log("callBotAPI | error:", error);
-                        reject(new Error("Oops! Something went wrong! (code: 1)"));
+                        throw new Error("Oops! Something went wrong! (code: 1)");
                     } else {
-                        try {
-                            let apiResponse = JSON.parse(body);
-                            if (apiResponse.result === 0) {
-                                resolve(apiResponse.content);
-                            } else {
-                                reject(new Error("Oops! Something went wrong! (code: 2)"));
-                            }
-                        } catch (jsonError) {
-                            reject(jsonError)
+                        let apiResponse = JSON.parse(body);
+                        if (apiResponse.result === 0) {
+                            resolve(apiResponse.content);
+                        } else {
+                            throw new Error("Oops! Something went wrong! (code: 2)");
                         }
                     }
                 });
